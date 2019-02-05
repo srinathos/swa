@@ -1,11 +1,16 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import activations as acts
+import torchvision.transforms as transforms
+import torch
 
-class AllConvNet(nn.Module):
+__all__ = ['AllConvNet']
 
-    def __init__(self, activation=F.relu, dropout=True, nc=3, num_classes=10, bn_affine=False):
-        super(AllConvNet, self).__init__()
+
+class AllConvNetBase(nn.Module):
+
+    def __init__(self, activation=acts.softplus, dropout=True, nc=3, num_classes=10, bn_affine=False):
+        super(AllConvNetBase, self).__init__()
         self.act = activation
         print(self.act)
         self.dropout = dropout
@@ -67,3 +72,24 @@ class AllConvNet(nn.Module):
         pool_out = self.global_avg(class_out)
         pool_out = torch.squeeze(pool_out)
         return pool_out
+
+
+class Base:
+    base = AllConvNetBase
+    args = list()
+    kwargs = dict()
+    transform_train = transforms.Compose([
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomCrop(32, padding=4),
+        transforms.ToTensor(),
+        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+    ])
+
+    transform_test = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+    ])
+
+
+class AllConvNet(Base):
+    pass
